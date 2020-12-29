@@ -1,15 +1,18 @@
 import javax.swing.*;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class PasswordGenerator extends JFrame {
     private JButton createButton;
-    private JCheckBox UppercaseCheckBox;
+    private JCheckBox uppercaseCheckBox;
     private JCheckBox lowercaseCheckBox;
     private JCheckBox numCheckBox;
     private JCheckBox specialCharsCheckBox;
     private JPanel mainPanel;
     private JTextField lengthTextField;
     private JTextField passwordTextField;
+
+    int passwordLength = -1;
+    int checkboxesChecked = 0;
+    StringBuilder selectedChars = new StringBuilder();
 
     public static void main(String[] args) {
         JFrame mainFrame = new JFrame("Create your own password");
@@ -23,35 +26,70 @@ public class PasswordGenerator extends JFrame {
     }
 
     public PasswordGenerator() {
-        StringBuilder selectedChars = new StringBuilder();
-        AtomicBoolean charsHaveBeenSelected = new AtomicBoolean(false);
         //Button management
         createButton.addActionListener(e -> {
-            //adding selected characters to the StringBuilder
-            if (UppercaseCheckBox.isSelected()) {
-                selectedChars.insert(0, "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
-                charsHaveBeenSelected.set(true);
+            //making sure password length is a valid input
+            try {
+                passwordLength = Integer.parseInt(lengthTextField.getText());
+                //making sure at least one checkbox is selected an that length field is not empty
+                if (!lengthTextField.getText().equals("") && checkboxesChecked > 0) {
+                    passwordTextField.setText(Generator.create(selectedChars.toString(), passwordLength).toString());
+                }
+                else {
+                    JOptionPane.showMessageDialog(null, "Enter a valid length and select characters please.");
+                }
             }
+            catch (Exception e1) {
+                JOptionPane.showMessageDialog(null, "Please enter a valid legth.");
+                //debugging
+                System.out.println(passwordLength);
+                System.out.println("Length field contains character(s) or is empty.");
+            }
+        });
+
+        //adding selected characters to the StringBuilder and removing unselected ones
+        uppercaseCheckBox.addActionListener(e -> {
+            if (uppercaseCheckBox.isSelected()) {
+                selectedChars.insert(0, "ABCDEFGHIJKLMNOPQRSTUVWXYZ");
+                checkboxesChecked += 1;
+            }
+            else if (selectedChars.toString().contains("A")) {
+                int uppercaseStartIndex = selectedChars.toString().indexOf("A");
+                selectedChars.delete(uppercaseStartIndex, uppercaseStartIndex + 26);
+                checkboxesChecked -= 1;
+            }
+        });
+        lowercaseCheckBox.addActionListener(e -> {
             if (lowercaseCheckBox.isSelected()) {
                 selectedChars.insert(0, "abcdefghijklmnopqrstuvwxyz");
-                charsHaveBeenSelected.set(true);
+                checkboxesChecked += 1;
             }
-            if (numCheckBox.isSelected()) {
-                selectedChars.insert(0, "1234567890");
-                charsHaveBeenSelected.set(true);
+            else if (selectedChars.toString().contains("a")) {
+                int lowercaseStartIndex = selectedChars.toString().indexOf("a");
+                selectedChars.delete(lowercaseStartIndex, lowercaseStartIndex + 26);
+                checkboxesChecked -= 1;
             }
+        });
+        specialCharsCheckBox.addActionListener(e -> {
             if (specialCharsCheckBox.isSelected()) {
                 selectedChars.insert(0, "!@#$%^&*()_+-={}|[]\\<>?/");
-                charsHaveBeenSelected.set(true);
+                checkboxesChecked += 1;
             }
-
-            //length field cant be empty
-            if (!lengthTextField.getText().equals("") && charsHaveBeenSelected.getAcquire()) {
-                int passLength = Integer.parseInt(lengthTextField.getText());
-                passwordTextField.setText(Generator.create(selectedChars.toString(), passLength).toString());
+            else if (selectedChars.toString().contains("!")) {
+                int uppercaseStartIndex = selectedChars.toString().indexOf("!");
+                selectedChars.delete(uppercaseStartIndex, uppercaseStartIndex + 24);
+                checkboxesChecked -= 1;
             }
-            else {
-                JOptionPane.showMessageDialog(null, "Give a password length and select characters please.");
+        });
+        numCheckBox.addActionListener(e -> {
+            if (numCheckBox.isSelected()) {
+                selectedChars.insert(0, "1234567890");
+                checkboxesChecked += 1;
+            }
+            else if (selectedChars.toString().contains("1")) {
+                int numStartIndex = selectedChars.toString().indexOf("1");
+                selectedChars.delete(numStartIndex, numStartIndex + 9);
+                checkboxesChecked -= 1;
             }
         });
     }
