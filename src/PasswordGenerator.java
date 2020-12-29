@@ -32,11 +32,11 @@ public class PasswordGenerator extends JFrame {
             try {
                 passwordLength = Integer.parseInt(lengthTextField.getText());
                 //making sure at least one checkbox is selected an that length field is not empty
-                if (!lengthTextField.getText().equals("") && checkboxesChecked > 0) {
+                if (checkboxesChecked > 0) {
                     passwordTextField.setText(Generator.create(selectedChars.toString(), passwordLength).toString());
                 }
                 else {
-                    JOptionPane.showMessageDialog(null, "Enter a valid length and select characters please.");
+                    JOptionPane.showMessageDialog(null, "Select characters please.");
                 }
             }
             catch (Exception e1) {
