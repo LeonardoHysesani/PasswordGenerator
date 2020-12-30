@@ -1,4 +1,7 @@
 import javax.swing.*;
+import java.awt.*;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
 
 public class PasswordGenerator extends JFrame {
     //JComponents
@@ -11,12 +14,13 @@ public class PasswordGenerator extends JFrame {
     private JTextField lengthTextField;
     private JTextField passwordTextField;
     private JTextArea recentPasswordsTextArea;
+    private JButton copyButton;
 
     //Variables
     int passwordLength = -1;
     int checkboxesChecked = 0;
     StringBuilder selectedChars = new StringBuilder();
-    int historyLength = 10;
+    int historyLength = 5;
     String[] recentPasswords = new String[historyLength];
 
     public static void main(String[] args) {
@@ -25,7 +29,7 @@ public class PasswordGenerator extends JFrame {
         mainFrame.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         mainFrame.pack();
         mainFrame.setVisible(true);
-        mainFrame.setSize(600, 350);
+        mainFrame.setSize(480, 240);
         mainFrame.setLocationRelativeTo(null);
         mainFrame.setResizable(true);
     }
@@ -40,11 +44,10 @@ public class PasswordGenerator extends JFrame {
         //Button management
         createButton.addActionListener(e -> {
             //making sure password length is a valid input
+            passwordLength = Integer.parseInt(lengthTextField.getText());
             try {
-                passwordLength = Integer.parseInt(lengthTextField.getText());
                 //making sure at least one checkbox is selected an that length field is not empty
                 if (checkboxesChecked > 0) {
-                    passwordTextField.setText(Generator.create(selectedChars.toString(), passwordLength).toString());
                     recentPasswordsTextArea.setText("");
                     for (int i = historyLength-1; i > 0; i--) {
                         recentPasswords[i] = recentPasswords[i-1];
@@ -52,6 +55,8 @@ public class PasswordGenerator extends JFrame {
                     }
                     recentPasswords[0] = passwordTextField.getText();
                     recentPasswordsTextArea.insert((char) 0x2022 + " " + recentPasswords[0] + "\n", 0);
+                    //adding this to the end and not the beginning allows to keep one more password as the current one does not need to be displayed
+                    passwordTextField.setText(Generator.create(selectedChars.toString(), passwordLength).toString());
                 }
                 else {
                     JOptionPane.showMessageDialog(null, "Select characters please.");
@@ -110,6 +115,15 @@ public class PasswordGenerator extends JFrame {
                 selectedChars.delete(numStartIndex, numStartIndex + 9);
                 checkboxesChecked -= 1;
             }
+        });
+
+        //copy to clipboard
+        copyButton.addActionListener(e->{
+            String myString = passwordTextField.getText();
+            StringSelection stringSelection = new StringSelection(myString);
+            Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+            clipboard.setContents(stringSelection, stringSelection);
+            JOptionPane.showMessageDialog(null, "Password copied to clipboard.");
         });
     }
 }
