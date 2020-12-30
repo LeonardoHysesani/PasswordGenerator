@@ -1,6 +1,7 @@
 import javax.swing.*;
 
 public class PasswordGenerator extends JFrame {
+    //JComponents
     private JButton createButton;
     private JCheckBox uppercaseCheckBox;
     private JCheckBox lowercaseCheckBox;
@@ -9,23 +10,33 @@ public class PasswordGenerator extends JFrame {
     private JPanel mainPanel;
     private JTextField lengthTextField;
     private JTextField passwordTextField;
+    private JTextArea recentPasswordsTextArea;
 
+    //Variables
     int passwordLength = -1;
     int checkboxesChecked = 0;
     StringBuilder selectedChars = new StringBuilder();
+    int historyLength = 10;
+    String[] recentPasswords = new String[historyLength];
 
     public static void main(String[] args) {
-        JFrame mainFrame = new JFrame("Create your own password");
+        JFrame mainFrame = new JFrame("Create custom password");
         mainFrame.setContentPane(new PasswordGenerator().mainPanel);
         mainFrame.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         mainFrame.pack();
         mainFrame.setVisible(true);
-        mainFrame.setSize(500, 200);
+        mainFrame.setSize(600, 350);
         mainFrame.setLocationRelativeTo(null);
         mainFrame.setResizable(true);
     }
 
     public PasswordGenerator() {
+        passwordTextField.setEditable(false);
+        recentPasswordsTextArea.setEditable(false);
+        for (int i = 0; i < historyLength; i++) {
+            recentPasswords[i] = "";
+        }
+
         //Button management
         createButton.addActionListener(e -> {
             //making sure password length is a valid input
@@ -34,15 +45,23 @@ public class PasswordGenerator extends JFrame {
                 //making sure at least one checkbox is selected an that length field is not empty
                 if (checkboxesChecked > 0) {
                     passwordTextField.setText(Generator.create(selectedChars.toString(), passwordLength).toString());
+                    recentPasswordsTextArea.setText("");
+                    for (int i = historyLength-1; i > 0; i--) {
+                        recentPasswords[i] = recentPasswords[i-1];
+                        recentPasswordsTextArea.insert((char) 0x2022 + " " + recentPasswords[i] + "\n", 0);
+                    }
+                    recentPasswords[0] = passwordTextField.getText();
+                    recentPasswordsTextArea.insert((char) 0x2022 + " " + recentPasswords[0] + "\n", 0);
                 }
                 else {
                     JOptionPane.showMessageDialog(null, "Select characters please.");
+                    //debugging
+                    System.out.println("No checkbox selected.");
                 }
             }
             catch (Exception e1) {
-                JOptionPane.showMessageDialog(null, "Please enter a valid legth.");
+                JOptionPane.showMessageDialog(null, "Enter a valid length please.");
                 //debugging
-                System.out.println(passwordLength);
                 System.out.println("Length field contains character(s) or is empty.");
             }
         });
