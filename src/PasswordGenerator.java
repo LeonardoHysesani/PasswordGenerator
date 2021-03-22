@@ -112,7 +112,7 @@ public class PasswordGenerator extends JFrame {
             }
             else if (selectedChars.toString().contains("1")) {
                 int numStartIndex = selectedChars.toString().indexOf("1");
-                selectedChars.delete(numStartIndex, numStartIndex + 9);
+                selectedChars.delete(numStartIndex, numStartIndex + 10);
                 checkboxesChecked -= 1;
             }
         });
